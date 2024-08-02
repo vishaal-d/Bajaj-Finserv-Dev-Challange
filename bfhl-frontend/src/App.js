@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import JsonInput from "./JsonInput";
 import ResponseDisplay from "./ResponseDisplay";
-import "./styles.css";
+import "./style.css";
 
 function App() {
   const [jsonInput, setJsonInput] = useState("");
