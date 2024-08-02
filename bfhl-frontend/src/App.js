@@ -1,23 +1,59 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import axios from "axios";
+import JsonInput from "./JsonInput";
+import ResponseDisplay from "./ResponseDisplay";
+import "./styles.css";
 
 function App() {
+  const [jsonInput, setJsonInput] = useState("");
+  const [responseData, setResponseData] = useState(null);
+  const [error, setError] = useState("");
+  const [visibleSections, setVisibleSections] = useState({
+    numbers: true,
+    characters: true,
+    highestAlphabet: true,
+  });
+
+  const handleJsonChange = (e) => {
+    setJsonInput(e.target.value);
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const json = JSON.parse(jsonInput);
+      const response = await axios.post(
+        "https://bfhl-api.herokuapp.com/bfhl",
+        json
+      );
+      setResponseData(response.data);
+      setError("");
+    } catch (err) {
+      setError("Invalid JSON or request failed");
+      setResponseData(null);
+    }
+  };
+
+  const handleSectionChange = (e) => {
+    const { name, checked } = e.target;
+    setVisibleSections((prev) => ({ ...prev, [name]: checked }));
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>Your Roll Number Here</h1>
+      <JsonInput
+        jsonInput={jsonInput}
+        onJsonChange={handleJsonChange}
+        onSubmit={handleSubmit}
+        error={error}
+      />
+      {responseData && (
+        <ResponseDisplay
+          data={responseData}
+          visibleSections={visibleSections}
+          onSectionChange={handleSectionChange}
+        />
+      )}
     </div>
   );
 }
